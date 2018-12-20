@@ -18,6 +18,8 @@
     "body-parser": "^1.18.3",
     "crypto": "^1.0.1",
     "express": "^4.16.4",
+    "mongoose": "^5.4.0",
+    "multer": "^1.4.1",
     "stellar-base": "^0.10.0",
     "tendermint": "^3.4.0",
     "varstruct": "^6.1.2"

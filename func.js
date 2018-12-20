@@ -55,12 +55,26 @@ export const getHeight = async () => {
     return data;
 }
 
+export const getAllTx = async (from, to) => {
+    const allData = [];
+    for(let i = from; i <= to; i++) {
+        const txs = await getTransactionInBlock(i);
+        // if(txs != null) {
+        //     const data = decodeData(txs[0]);
+        //     allData.push(data);
+        // }
+        console.log(txs);
+    }
+    return allData;
+}
+
 function getTransactionInBlock(height) {
     return client.block({ height }).then(res => {
         // const block = res.block;
         // if(block.header.num_txs > 0)
         //     return block.data.txs
-        return res.block.data.txs;
+        // return res.block.data.txs;
+        return res;
     })
 }
 
