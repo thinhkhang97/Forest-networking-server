@@ -25,6 +25,7 @@ const schema = new Schema({
     // Posts of the user
     posts: [{
             content: String,
+            title: String,
             time: Date,
             image: {
                 data: Buffer,

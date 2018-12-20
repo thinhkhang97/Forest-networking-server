@@ -91,10 +91,71 @@ export async function payment(publicKey, amount) {
     )
 }
 
+
+////// POST //////
 export function updatePosts(publicKey, posts) {
 
 }
 
-export async function getPosts(publicKey) {
+export async function getAllPosts(publicKey) {
+    connectServer();
+    let posts = [];
+    await person.findOne({
+        _id: publicKey
+    }, function(err, person){
+        if(err) console.log('ERROR GET ALL POST');
+        else posts = person.posts;
+    })
+    console.log('Get posts', posts);
+    mongoose.disconnect();
+    return posts;
+}
+
+export async function getPosts(publicKey, id) {
+    connectServer();
+    let post = null;
+    await person.findOne({
+        _id: publicKey
+    },function(err, person){
+        if(err) console.log('ERROR GET ALL POST');
+        else {
+            console.log(person);
+            person.posts.map(p=>{
+                if(p._id == id)
+                    post = p
+            })
+        }
+    })
+    console.log('POST FOUND', post);
+    mongoose.disconnect();
+    return post;
+}
+
+export function createPost(
+    publicKey,
+    Title = 'New post for new day',
+    Content = 'Unknown content',
+    ShareWith = [],
+    Image = {},
+) {
+    connectServer();
+    person.update({
+        _id: publicKey,
+        $push: {
+            posts: {
+                title: Title,
+                content: Content,
+                shareWith: ShareWith,
+                image: Image
+            }
+        }
+    }, function(err, person){
+        if(err) console.log('ERROR CREATE POST', err);
+        else console.log('CREATED POST:', person.posts);
+        mongoose.disconnect();
+    })
+}
+
+export function interactPost(publicKey, postId, interact) {
 
 }
