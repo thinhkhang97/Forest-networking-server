@@ -10,7 +10,7 @@ function connectServer() {
         console.log('Connected to db');
     })
 }
-
+/////// ACCOUNT ///////
 export function createAccount(publicKey) {
     connectServer();
     const p = new person({
@@ -29,6 +29,43 @@ export function createAccount(publicKey) {
         mongoose.disconnect();
     })
 }
+
+export async function getAccountInfo(publicKey) {
+    connectServer();
+    let accountInfo = null;
+    await person.findOne({
+        _id: publicKey
+    }, function(err, person){
+        accountInfo = person;
+    })
+    console.log('Account: ', accountInfo);
+    mongoose.disconnect();
+    return accountInfo;
+}
+
+export function updateAccountInfo (
+    PublicKey,
+    Username = 'Anonymous', 
+    Avatar = './db/seed/avatar.png',
+    ContentType = 'image/png'
+) {
+    connectServer(); 
+    person.update(
+        {_id: PublicKey},
+        {
+            username: Username,
+            avatar: {
+                data: fs.readFileSync(Avatar),
+                contentType: ContentType
+            }
+        }, function(err, person) {
+            if(err) console.log('ERROR', err);
+            else console.log('UPDATED: ', person);
+            mongoose.disconnect();
+        }
+        )
+}
+/////// -ACCOUNT ///////
 
 async function getBalance(publicKey) {
     let balance = 0;
@@ -52,4 +89,12 @@ export async function payment(publicKey, amount) {
             mongoose.disconnect();
         }
     )
+}
+
+export function updatePosts(publicKey, posts) {
+
+}
+
+export async function getPosts(publicKey) {
+
 }
