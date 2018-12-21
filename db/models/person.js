@@ -13,7 +13,7 @@ const schema = new Schema({
         contentType: String,
     },
     // Public key of user
-    _id: {
+    publicKey: {
         type: String,
         required: true,
     },
@@ -24,6 +24,7 @@ const schema = new Schema({
     },
     // Posts of the user
     posts: [{
+            postId: String,
             content: String,
             title: String,
             time: Date,

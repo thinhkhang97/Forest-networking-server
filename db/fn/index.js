@@ -1,5 +1,6 @@
 import mongoose, { mongo } from 'mongoose';
 import person from '../models/person';
+import system from '../models/system';
 import fs from 'fs';
 
 function connectServer() {
@@ -11,35 +12,35 @@ function connectServer() {
     })
 }
 /////// ACCOUNT ///////
-export function createAccount(publicKey) {
-    connectServer();
+export async function createAccount(publicKey) {
+    // connectServer();
     const p = new person({
         username: 'Anonymous',
         avatar: {
             data: fs.readFileSync('./db/seed/avatar.png'),
             contentType: 'image/png'
         },
-        _id: publicKey,
+        publicKey: publicKey,
         balance: 0,
         posts: []
     })
-    p.save(function(err, person){
-        if(err) console.log('ERROR: ADDED DATA FAIL');
-        else console.log('ADDED: ', person);
-        mongoose.disconnect();
+    await p.save(function(err, person){
+        if(err) console.log('ERROR: CREATE ACCOUNT FAIL');
+        // else console.log('ACCOUNT: ', person);
+        // mongoose.disconnect();
     })
 }
 
 export async function getAccountInfo(publicKey) {
-    connectServer();
+    // connectServer();
     let accountInfo = null;
     await person.findOne({
-        _id: publicKey
+        publicKey: publicKey
     }, function(err, person){
         accountInfo = person;
     })
-    console.log('Account: ', accountInfo);
-    mongoose.disconnect();
+    // console.log('Account: ', accountInfo);
+    // mongoose.disconnect();
     return accountInfo;
 }
 
@@ -49,9 +50,9 @@ export function updateAccountInfo (
     Avatar = './db/seed/avatar.png',
     ContentType = 'image/png'
 ) {
-    connectServer(); 
+    // connectServer(); 
     person.update(
-        {_id: PublicKey},
+        {publicKey: PublicKey},
         {
             username: Username,
             avatar: {
@@ -60,8 +61,8 @@ export function updateAccountInfo (
             }
         }, function(err, person) {
             if(err) console.log('ERROR', err);
-            else console.log('UPDATED: ', person);
-            mongoose.disconnect();
+            // else console.log('UPDATED: ', person);
+            // mongoose.disconnect();
         }
         )
 }
@@ -70,23 +71,23 @@ export function updateAccountInfo (
 async function getBalance(publicKey) {
     let balance = 0;
     await person.findOne({
-        _id: publicKey
+        publicKey: publicKey
     }, function (err, person) {
         balance = person.balance;
     })
-    console.log('Balance before: ', balance);
+    // console.log('Balance before: ', balance);
     return balance;
 }
 
 export async function payment(publicKey, amount) {
-    connectServer();
+    // connectServer();
     const balance = await getBalance(publicKey);
-    console.log('Old balance', balance);
+    // console.log('Old balance', balance);
     const newBalance = balance + amount;
-    person.update({ _id: publicKey },
+    person.update({ publicKey: publicKey },
         { balance: newBalance }, function (err, person) {
-            console.log('New Balance', newBalance);
-            mongoose.disconnect();
+            // console.log('New Balance', newBalance);
+            // mongoose.disconnect();
         }
     )
 }
@@ -98,36 +99,36 @@ export function updatePosts(publicKey, posts) {
 }
 
 export async function getAllPosts(publicKey) {
-    connectServer();
+    // connectServer();
     let posts = [];
     await person.findOne({
-        _id: publicKey
+        publicKey: publicKey
     }, function(err, person){
         if(err) console.log('ERROR GET ALL POST');
         else posts = person.posts;
     })
-    console.log('Get posts', posts);
-    mongoose.disconnect();
+    // console.log('Get posts', posts);
+    // mongoose.disconnect();
     return posts;
 }
 
 export async function getPosts(publicKey, id) {
-    connectServer();
+    // connectServer();
     let post = null;
     await person.findOne({
-        _id: publicKey
+        publicKey: publicKey
     },function(err, person){
         if(err) console.log('ERROR GET ALL POST');
         else {
-            console.log(person);
+            // console.log(person);
             person.posts.map(p=>{
-                if(p._id == id)
+                if(p.postId == id)
                     post = p
             })
         }
     })
-    console.log('POST FOUND', post);
-    mongoose.disconnect();
+    // console.log('POST FOUND', post);
+    // mongoose.disconnect();
     return post;
 }
 
@@ -138,24 +139,30 @@ export function createPost(
     ShareWith = [],
     Image = {},
 ) {
-    connectServer();
+    // connectServer();
     person.update({
-        _id: publicKey,
+        publicKey: publicKey,
         $push: {
             posts: {
-                title: Title,
                 content: Content,
+                title: Title,
                 shareWith: ShareWith,
                 image: Image
             }
         }
     }, function(err, person){
         if(err) console.log('ERROR CREATE POST', err);
-        else console.log('CREATED POST:', person.posts);
-        mongoose.disconnect();
+        // else console.log('CREATED POST:', person.posts);
+        // mongoose.disconnect();
     })
 }
 
 export function interactPost(publicKey, postId, interact) {
 
 }
+
+////// SYSTEM /////
+export async function getHeight() {
+    // let height = 0;
+    // await system.find
+} 
