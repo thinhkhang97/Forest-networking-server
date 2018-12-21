@@ -26,7 +26,7 @@ async function connectServer() {
 
 async function getData() {
     await connectServer();
-    for(let i = 8001; i <=10000; i++) {
+    for(let i = 1; i <=15000; i++) {
         await processBlockData(i);
     }
     console.log('END GET DATA');

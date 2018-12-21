@@ -1,16 +1,20 @@
 import { RpcClient } from 'tendermint';
 let client = RpcClient('wss://komodo.forest.network:443');
 import Tx from '../../transaction';
+const base32 = require('base32.js');
 import {
     createAccount, payment, getAccountInfo,
-    updateAccountInfo, createPost, getAllPosts,
-    getPosts
+    updateNameAccount, createPost, getAllPosts,
+    getPosts, updateImageAccount, updateFollowingsAccount
 } from '../fn';
 const vstruct = require('varstruct');
 const PlainTextContent = vstruct([
     { name: 'type', type: vstruct.UInt8 },
     { name: 'text', type: vstruct.VarString(vstruct.UInt16BE) },
 ]);
+const Followings = vstruct([
+    { name: 'addresses', type: vstruct.VarArray(vstruct.UInt16BE, vstruct.Buffer(35)) },
+  ]);
 
 // Read the data in block and import to data base
 export const processBlockData = async (height) => {
@@ -62,7 +66,29 @@ export const processBlockData = async (height) => {
                 }
                 break;
             case 'update_account': 
-                console.log('UPDATE ACCOUNT');
+                try {
+                    switch (data.params.key) {
+                        case 'name':
+                        const name = data.params.value.toString('base64');
+                        updateNameAccount(account,name);
+                            break;
+                        case 'picture':
+                        const imgData = data.params.value.toString('base64');
+                        updateImageAccount(account,imgData);
+                            break;
+                        case 'followings':
+                            const followingsData = Followings.decode(data.params.value).addresses.map(f=>{
+                                return {
+                                    publicKey: base32.encode(f)
+                                }
+                            })
+                            updateFollowingsAccount(account,followingsData);
+                            break;
+                    }
+                    console.log('UPDATE ACCOUNT');
+                }catch(err){
+                    console.log('ERROR READING UPDATE ACCOUNT BLOCK')
+                }
                 break;
             case 'interact':
                 console.log('INTERACT');

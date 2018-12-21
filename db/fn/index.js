@@ -44,10 +44,10 @@ export async function getAccountInfo(publicKey) {
     return accountInfo;
 }
 
-export function updateAccountInfo (
+export function updateNameAccount (
     PublicKey,
-    Username = 'Anonymous', 
-    Avatar = './db/seed/avatar.png',
+    Username = 'Anonymous',
+    AvatarData = fs.readFileSync('./db/seed/avatar.png'),
     ContentType = 'image/png'
 ) {
     // connectServer(); 
@@ -55,8 +55,25 @@ export function updateAccountInfo (
         {publicKey: PublicKey},
         {
             username: Username,
+        }, function(err, person) {
+            if(err) console.log('ERROR', err);
+            // else console.log('UPDATED: ', person);
+            // mongoose.disconnect();
+        }
+        )
+}
+
+export function updateImageAccount (
+    PublicKey,
+    AvatarData = fs.readFileSync('./db/seed/avatar.png'),
+    ContentType = 'image/png'
+) {
+    // connectServer(); 
+    person.update(
+        {publicKey: PublicKey},
+        {
             avatar: {
-                data: fs.readFileSync(Avatar),
+                data: AvatarData,
                 contentType: ContentType
             }
         }, function(err, person) {
@@ -66,6 +83,41 @@ export function updateAccountInfo (
         }
         )
 }
+
+export function updateFollowingsAccount (
+    PublicKey,
+    followings = []
+) {
+    // connectServer(); 
+    person.update(
+        {publicKey: PublicKey},
+        {
+            following: followings 
+        }, function(err, person) {
+            if(err) console.log('ERROR', err);
+            // else console.log('UPDATED: ', person);
+            // mongoose.disconnect();
+        }
+        )
+}
+
+export function updateFollowersAccount (
+    PublicKey,
+    followers = []
+) {
+    // connectServer(); 
+    person.update(
+        {publicKey: PublicKey},
+        {
+            followers: followers 
+        }, function(err, person) {
+            if(err) console.log('ERROR', err);
+            // else console.log('UPDATED: ', person);
+            // mongoose.disconnect();
+        }
+        )
+}
+
 /////// -ACCOUNT ///////
 
 async function getBalance(publicKey) {
