@@ -5,7 +5,8 @@ const base32 = require('base32.js');
 import {
     createAccount, payment, getAccountInfo,
     updateNameAccount, createPost, getAllPosts,
-    getPosts, updateImageAccount, updateFollowingsAccount
+    getPosts, updateImageAccount, updateFollowingsAccount,
+    addFollowersAccount
 } from '../fn';
 const vstruct = require('varstruct');
 const PlainTextContent = vstruct([
@@ -69,23 +70,31 @@ export const processBlockData = async (height) => {
                 try {
                     switch (data.params.key) {
                         case 'name':
-                        const name = data.params.value.toString('base64');
-                        updateNameAccount(account,name);
+                        const name = data.params.value.toString();
+                        await updateNameAccount(account,name);
+                        console.log('UPDATE ACCOUNT', account, 'NAME', name);
                             break;
                         case 'picture':
-                        const imgData = data.params.value.toString('base64');
-                        updateImageAccount(account,imgData);
+                        const imgData = data.params.value.toString();
+                        await updateImageAccount(account,imgData);
+                        console.log('UPDATE ACCOUNT', account, 'IMAGE', imgData);
                             break;
                         case 'followings':
-                            const followingsData = Followings.decode(data.params.value).addresses.map(f=>{
+                            const listFollowing = Followings.decode(data.params.value).addresses;
+                            const followingsData = listFollowing.map(f=>{
                                 return {
                                     publicKey: base32.encode(f)
                                 }
                             })
-                            updateFollowingsAccount(account,followingsData);
+                            console.log('UPDATE ACCOUNT', account, 'FOLLOWING', followingsData);
+                            await updateFollowingsAccount(account,followingsData);
+                            for(let id = 0; id < listFollowing.length; id++) {
+                                await addFollowersAccount(followingsData[id].publicKey, {
+                                    publicKey: account
+                                });
+                            }
                             break;
                     }
-                    console.log('UPDATE ACCOUNT');
                 }catch(err){
                     console.log('ERROR READING UPDATE ACCOUNT BLOCK')
                 }
@@ -101,10 +110,10 @@ export const genesisBlock = async () => {
     return await client.genesis();
 }
 
-export const getHeight = async () => {
+export const getHeightOfBlockchain = async () => {
     const data = await client.status();
-    console.log('blockchain status: ', data);
-    return data;
+    console.log('blockchain status: ', data.sync_info.latest_block_height);
+    return data.sync_info.latest_block_height;
 }
 
 export const getAllTx = async (from, to) => {

@@ -44,14 +44,14 @@ export async function getAccountInfo(publicKey) {
     return accountInfo;
 }
 
-export function updateNameAccount (
+export async function updateNameAccount (
     PublicKey,
     Username = 'Anonymous',
     AvatarData = fs.readFileSync('./db/seed/avatar.png'),
     ContentType = 'image/png'
 ) {
     // connectServer(); 
-    person.update(
+    await person.update(
         {publicKey: PublicKey},
         {
             username: Username,
@@ -63,13 +63,13 @@ export function updateNameAccount (
         )
 }
 
-export function updateImageAccount (
+export async function updateImageAccount (
     PublicKey,
     AvatarData = fs.readFileSync('./db/seed/avatar.png'),
     ContentType = 'image/png'
 ) {
     // connectServer(); 
-    person.update(
+    await person.update(
         {publicKey: PublicKey},
         {
             avatar: {
@@ -84,12 +84,12 @@ export function updateImageAccount (
         )
 }
 
-export function updateFollowingsAccount (
+export async function updateFollowingsAccount (
     PublicKey,
     followings = []
 ) {
     // connectServer(); 
-    person.update(
+    await person.update(
         {publicKey: PublicKey},
         {
             following: followings 
@@ -100,22 +100,41 @@ export function updateFollowingsAccount (
         }
         )
 }
-
-export function updateFollowersAccount (
-    PublicKey,
-    followers = []
-) {
-    // connectServer(); 
-    person.update(
-        {publicKey: PublicKey},
-        {
-            followers: followers 
-        }, function(err, person) {
-            if(err) console.log('ERROR', err);
-            // else console.log('UPDATED: ', person);
-            // mongoose.disconnect();
+async function isFollowerExist(publicKey, follower) {
+    let isExist = false;
+    // console.log('CHECK', publicKey, follower);
+    await person.findOne({
+        publicKey: publicKey,
+    }, function(err, person){
+        if(err) console.log('ERROR WHEN FIND FOLLOWER');
+        else {
+            // console.log(person.followers)
+            if(person !== null)
+                for(let i = 0; i < person.followers.length; i++) {
+                    if(person.followers[i].publicKey === follower)
+                        isExist = true; 
+                }
+            else isExist = true;
         }
-        )
+    })
+    // console.log(isExist);
+    return isExist;
+}
+export async function addFollowersAccount (
+    PublicKey,
+    follower
+) {
+    const isExist = await isFollowerExist(PublicKey, follower.publicKey);
+    if(isExist === false)
+        await person.findOneAndUpdate(
+            {publicKey: PublicKey},
+            {
+                $push: {
+                    followers: follower
+                }
+            },
+            { upsert: true, new: true }
+            )
 }
 
 /////// -ACCOUNT ///////
@@ -125,7 +144,8 @@ async function getBalance(publicKey) {
     await person.findOne({
         publicKey: publicKey
     }, function (err, person) {
-        balance = person.balance;
+        if(person)
+            balance = person.balance; 
     })
     // console.log('Balance before: ', balance);
     return balance;
@@ -157,7 +177,10 @@ export async function getAllPosts(publicKey) {
         publicKey: publicKey
     }, function(err, person){
         if(err) console.log('ERROR GET ALL POST');
-        else posts = person.posts;
+        else {
+            if(person)
+                posts = person.posts;
+        }
     })
     // console.log('Get posts', posts);
     // mongoose.disconnect();
@@ -173,10 +196,12 @@ export async function getPosts(publicKey, id) {
         if(err) console.log('ERROR GET ALL POST');
         else {
             // console.log(person);
-            person.posts.map(p=>{
-                if(p.postId == id)
-                    post = p
-            })
+            if(person) {
+                person.posts.map(p=>{
+                    if(p.postId == id)
+                        post = p
+                })
+            }
         }
     })
     // console.log('POST FOUND', post);
@@ -215,6 +240,33 @@ export function interactPost(publicKey, postId, interact) {
 
 ////// SYSTEM /////
 export async function getHeight() {
-    // let height = 0;
-    // await system.find
+    let height = -1;
+    await system.findOne({
+        type: 'height'
+    }, function(err, system){
+        if(err) console.log('ERROR GET HEIGHT');
+        else {
+            if(system != null)
+                height = system.height
+        }
+    })
+    return height;
 } 
+
+export async function updateHeight(Height) {
+    await system.updateOne({
+        type: 'height'
+    },{
+        height: Height
+    })
+}
+
+export async function initSystem() {
+    // create user master
+    await createAccount('GA6IW2JOWMP4WGI6LYAZ76ZPMFQSJAX4YLJLOQOWFC5VF5C6IGNV2IW7');
+    const s = new system({
+        type: 'height',
+        height: 0
+    });
+    await s.save();
+}
