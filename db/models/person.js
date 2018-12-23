@@ -6,7 +6,6 @@ const schema = new Schema({
     // User name to show on the networking
     username: {
         type: String,
-        required: true,
     },
     avatar: {
         data: Buffer,
@@ -15,12 +14,10 @@ const schema = new Schema({
     // Public key of user
     publicKey: {
         type: String,
-        required: true,
     },
     // The balance of user
     balance: {
         type: Number,
-        required: true,
     },
     // Posts of the user
     posts: [{

@@ -4,7 +4,7 @@
   "description": "The RPC client to connect to blockchain node",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node_modules/.bin/babel-node test.js",
     "start": "node_modules/.bin/babel-node app.js"
   },
   "author": "khang",

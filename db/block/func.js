@@ -19,7 +19,6 @@ const Followings = vstruct([
 
 // Read the data in block and import to data base
 export const processBlockData = async (height) => {
-    // Loop all blocks to get all data
     const tx = await getTransactionInBlock(height);
     if (tx != null) {
         console.log('PROCESS HEIGHT:',height);
@@ -34,9 +33,9 @@ export const processBlockData = async (height) => {
                     console.log('Account is already exist');
                     return;
                 }
-                console.log( 'CREATE ACCOUNT', account, 'SEQUENCE', 0, 'BALANCE', 0, 'POSTS', []);
+                console.log( 'ACCOUNT', account,'CREATE ACCOUNT', newAccount, 'SEQUENCE', 0, 'BALANCE', 0, 'POSTS', []);
                 await createAccount(newAccount);
-                break;
+                return;
             case 'payment':
                 const toAccount = data.params.address;
                 const isExistPayment = await getAccountInfo(toAccount);
@@ -47,9 +46,9 @@ export const processBlockData = async (height) => {
                 // find the to address
                 const amount = parseInt(data.params.amount);
                 console.log('ACCOUNT PAYMENT: FROM', account, 'TO', toAccount, 'AMOUNT', amount);
-                await payment(account, 0 - amount);
+                const d = await payment(account, 0 - amount);
                 await payment(toAccount, amount);
-                break;
+                return d;
             case 'post':
                 try {
                     const content = PlainTextContent.decode(data.params.content)
@@ -61,24 +60,24 @@ export const processBlockData = async (height) => {
                         });
                     })
                     console.log('POST: FROM', account, 'CONTENT', content, 'SHARE WITH', shareWith);
-                    createPost(account, 'No title',content.text,shareWith);
+                    await createPost(account, 'No title',content.text,shareWith);
                 } catch(err) {
                     console.log('ERROR TO READ BLOCK');
                 }
-                break;
+                return;
             case 'update_account': 
                 try {
                     switch (data.params.key) {
                         case 'name':
-                        const name = data.params.value.toString();
-                        await updateNameAccount(account,name);
-                        console.log('UPDATE ACCOUNT', account, 'NAME', name);
-                            break;
+                            const name = data.params.value.toString();
+                            await updateNameAccount(account,name);
+                            console.log('UPDATE ACCOUNT', account, 'NAME', name);
+                                return;
                         case 'picture':
-                        const imgData = data.params.value.toString();
-                        await updateImageAccount(account,imgData);
-                        console.log('UPDATE ACCOUNT', account, 'IMAGE', imgData);
-                            break;
+                            const imgData = data.params.value.toString();
+                            await updateImageAccount(account,imgData);
+                            console.log('UPDATE ACCOUNT', account, 'IMAGE');
+                                return;
                         case 'followings':
                             const listFollowing = Followings.decode(data.params.value).addresses;
                             const followingsData = listFollowing.map(f=>{
@@ -93,12 +92,12 @@ export const processBlockData = async (height) => {
                                     publicKey: account
                                 });
                             }
-                            break;
+                            return;
                     }
                 }catch(err){
                     console.log('ERROR READING UPDATE ACCOUNT BLOCK')
                 }
-                break;
+                return;
             case 'interact':
                 console.log('INTERACT');
                 break;
@@ -133,7 +132,7 @@ export function getTransactionInBlock(height) {
     return client.block({ height }).then(res => {
         const block = res.block;
         if (block.header.num_txs > 0) {
-            console.log(block.data.txs);
+            // console.log(block.data.txs);
             return block.data.txs
         }
         // return res.block.data.txs;
