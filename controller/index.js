@@ -13,13 +13,20 @@ function sendResponse(res, code, success, message, data=null, ) {
 }
 
 export async function getAccount(req, res) {
-    connectServer();
     const accountInfo = await getAccountInfo(req.params.publicKey);
     if(accountInfo === null) {
-        mongoose.disconnect();
-        return sendResponse(res,404,'false','Couldnt find this user in database');
+        return sendResponse(res,204,'false','Couldnt find this user in database');
     } else {
-        mongoose.disconnect();
         return sendResponse(res,200,'ok','Found the user',accountInfo);
     }
 } 
+
+export async function getNewFeed(req, res) {
+    console.log('Page:', req.params.page, 'perpage:', req.params.perpage);
+    const allNewFeed = await getNewFeed(req.params.page, req.params.perpage);
+    if(allNewFeed === null) {
+        return sendResponse(res,204,'false','Couldnt find data of newsfeed');
+    } else {
+        return sendResponse(res,200,'ok','Get all newsfeed',allNewFeed);
+    }
+}

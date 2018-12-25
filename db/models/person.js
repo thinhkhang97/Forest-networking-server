@@ -24,7 +24,7 @@ const schema = new Schema({
             postId: String,
             content: String,
             title: String,
-            time: Date,
+            time: String,
             image: {
                 data: Buffer,
                 contentType: String,

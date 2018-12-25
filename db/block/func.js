@@ -22,7 +22,7 @@ export const processBlockData = async (height) => {
     const tx = await getTransactionInBlock(height);
     if (tx != null) {
         console.log('PROCESS HEIGHT:',height);
-        const data = decodeData(tx[0])
+        const data = decodeData(tx.data)
         const account = data.account;
         const operation = data.operation;
         switch (operation) {
@@ -60,7 +60,7 @@ export const processBlockData = async (height) => {
                         });
                     })
                     console.log('POST: FROM', account, 'CONTENT', content, 'SHARE WITH', shareWith);
-                    await createPost(account, 'No title',content.text,shareWith);
+                    await createPost(account, 'No title',content.text,tx.time,shareWith);
                 } catch(err) {
                     console.log('ERROR TO READ BLOCK');
                 }
@@ -132,8 +132,12 @@ export function getTransactionInBlock(height) {
     return client.block({ height }).then(res => {
         const block = res.block;
         if (block.header.num_txs > 0) {
-            // console.log(block.data.txs);
-            return block.data.txs
+            const txinfo = {
+                time: block.header.time,
+                data: block.data.txs[0]
+            }
+            console.log(txinfo);
+            return txinfo;
         }
         // return res.block.data.txs;
         // return res;
