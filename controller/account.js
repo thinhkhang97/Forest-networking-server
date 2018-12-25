@@ -11,7 +11,7 @@ export async function getAccount(req, res) {
 }
 
 export async function getSomeAccount(req, res) {
-    console.log('In get some user', req.params.page, req.params.perpage);
+    // console.log('In get some user', req.params.page, req.params.perpage);
     const page = parseInt(req.params.page);
     const perpage = parseInt(req.params.perpage);
     const users = await getSomeUser(page, perpage);

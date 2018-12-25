@@ -73,7 +73,7 @@ export async function interactPost(publicKey, postId, interact) {
 
 export async function getNewFeed(page, perpage) {
     let data = null;
-    console.log('In get all new feeds');
+    // console.log('In get all new feeds');
     const query = newsfeed.find(
         {},
         {},

@@ -33,19 +33,19 @@ function broadcastCommitTrans2(t) {
       }).then(res=>{console.log(res.data)})
 }
 
-// const myTransaction = {
-//     version: 1,
-//     sequence: 4,
-//     memo: Buffer.from(''),
-//     operation: 'payment',
-//     params: {
-//         address: 'GBCFV7T4LQIS5A7QL7ZC4CFWYJSWNDAGJNP45CV6O3NJIP6LS2V4DI7Z',
-//         amount: 30000000
-//     }
-// }
+const myTransaction = {
+    version: 1,
+    sequence: 17,
+    memo: Buffer.from(''),
+    operation: 'payment',
+    params: {
+        address: 'GASKH5T53W3CGU4XQZ2XEOAKZOXIX3HHAER4DUC3HQH6RXMCNXXCBNXS',
+        amount: 12
+    }
+}
 
-// Tx.sign(myTransaction,PRIVATE_KEY);
-// console.log(Tx.encode(myTransaction));
+Tx.sign(myTransaction,PRIVATE_KEY);
+console.log(Tx.encode(myTransaction).toString('base64'));
 // client.broadcastTxCommit({tx: Tx.encode(myTransaction).toString('base64')}).then(res=>{
 //     console.log(res);
 // })
