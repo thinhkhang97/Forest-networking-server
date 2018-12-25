@@ -1,5 +1,4 @@
 import { RpcClient } from 'tendermint';
-<<<<<<< HEAD
 let client = RpcClient('wss://zebra.forest.network:443');
 import Tx from '../../transaction';
 const base32 = require('base32.js');
@@ -13,17 +12,6 @@ import {
 } from '../fn/account';
 import {payment} from '../fn/balance';
 import {createPost, } from '../fn/newsfeed';
-=======
-let client = RpcClient('wss://komodo.forest.network:443');
-import Tx from '../../transaction';
-const base32 = require('base32.js');
-import {
-    createAccount, payment, getAccountInfo,
-    updateNameAccount, createPost, getAllPosts,
-    getPosts, updateImageAccount, updateFollowingsAccount,
-    addFollowersAccount
-} from '../fn';
->>>>>>> c3f4f8a3e1d38565571b22052c2b14b01f004a76
 const vstruct = require('varstruct');
 const PlainTextContent = vstruct([
     { name: 'type', type: vstruct.UInt8 },
@@ -50,11 +38,7 @@ export const processBlockData = async (height) => {
                     return;
                 }
                 console.log( 'ACCOUNT', account,'CREATE ACCOUNT', newAccount, 'SEQUENCE', 0, 'BALANCE', 0, 'POSTS', []);
-<<<<<<< HEAD
                 await createAccount(account,newAccount,data.sequence);
-=======
-                await createAccount(newAccount);
->>>>>>> c3f4f8a3e1d38565571b22052c2b14b01f004a76
                 return;
             case 'payment':
                 const toAccount = data.params.address;
@@ -66,13 +50,8 @@ export const processBlockData = async (height) => {
                 // find the to address
                 const amount = parseInt(data.params.amount);
                 console.log('ACCOUNT PAYMENT: FROM', account, 'TO', toAccount, 'AMOUNT', amount);
-<<<<<<< HEAD
                 const d = await payment(account, 0 - amount, data.sequence);
                 await payment(toAccount, amount, null);
-=======
-                const d = await payment(account, 0 - amount);
-                await payment(toAccount, amount);
->>>>>>> c3f4f8a3e1d38565571b22052c2b14b01f004a76
                 return d;
             case 'post':
                 try {
@@ -85,11 +64,7 @@ export const processBlockData = async (height) => {
                         });
                     })
                     console.log('POST: FROM', account, 'CONTENT', content, 'SHARE WITH', shareWith);
-<<<<<<< HEAD
                     await createPost(account, 'No title',content.text,tx.time,shareWith, data.sequence);
-=======
-                    await createPost(account, 'No title',content.text,tx.time,shareWith);
->>>>>>> c3f4f8a3e1d38565571b22052c2b14b01f004a76
                 } catch(err) {
                     console.log('ERROR TO READ BLOCK');
                 }
@@ -99,21 +74,12 @@ export const processBlockData = async (height) => {
                     switch (data.params.key) {
                         case 'name':
                             const name = data.params.value.toString();
-<<<<<<< HEAD
                             await updateNameAccount(account,name,data.sequence);
                             console.log('UPDATE ACCOUNT', account, 'NAME', name);
                                 return;
                         case 'picture':
                             const imgData = data.params.value.toString('base64');
                             await updateImageAccount(account,imgData,data.sequence);
-=======
-                            await updateNameAccount(account,name);
-                            console.log('UPDATE ACCOUNT', account, 'NAME', name);
-                                return;
-                        case 'picture':
-                            const imgData = data.params.value.toString();
-                            await updateImageAccount(account,imgData);
->>>>>>> c3f4f8a3e1d38565571b22052c2b14b01f004a76
                             console.log('UPDATE ACCOUNT', account, 'IMAGE');
                                 return;
                         case 'followings':
@@ -124,11 +90,7 @@ export const processBlockData = async (height) => {
                                 }
                             })
                             console.log('UPDATE ACCOUNT', account, 'FOLLOWING', followingsData);
-<<<<<<< HEAD
                             await updateFollowingsAccount(account,followingsData,data.sequence);
-=======
-                            await updateFollowingsAccount(account,followingsData);
->>>>>>> c3f4f8a3e1d38565571b22052c2b14b01f004a76
                             for(let id = 0; id < listFollowing.length; id++) {
                                 await addFollowersAccount(followingsData[id].publicKey, {
                                     publicKey: account

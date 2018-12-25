@@ -1,17 +1,9 @@
-<<<<<<< HEAD
 import {initSystem, getHeight, updateHeight} from './db/fn/system';
-=======
-import {initSystem, getHeight, updateHeight} from './db/fn';
->>>>>>> c3f4f8a3e1d38565571b22052c2b14b01f004a76
 import {getHeightOfBlockchain, processBlockData, getTransactionInBlock} from './db/block/func';
 import express from 'express';
 import router from './router';
 import bodyParser from 'body-parser';
 import mongoose, { mongo } from 'mongoose';
-<<<<<<< HEAD
-=======
-import {createPost} from './db/fn';
->>>>>>> c3f4f8a3e1d38565571b22052c2b14b01f004a76
 import cors from 'cors';
 import proxy from 'http-proxy-middleware';
 function connectServer() {
@@ -57,11 +49,7 @@ async function run() {
         sleep(5000);
     }
 }
-<<<<<<< HEAD
 // run()
-=======
-// run();
->>>>>>> c3f4f8a3e1d38565571b22052c2b14b01f004a76
 connectServer();
 // getNewFeed(1,20);
 

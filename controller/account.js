@@ -11,7 +11,10 @@ export async function getAccount(req, res) {
 }
 
 export async function getSomeAccount(req, res) {
-    const users = await getSomeUser(req.params.page, req.params.perpage);
+    console.log('In get some user', req.params.page, req.params.perpage);
+    const page = parseInt(req.params.page);
+    const perpage = parseInt(req.params.perpage);
+    const users = await getSomeUser(page, perpage);
     if(users === null) {
         return sendResponse(res,204,'false','Couldnt find any users in database');
     } else {
