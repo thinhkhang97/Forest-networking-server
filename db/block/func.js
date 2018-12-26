@@ -105,13 +105,8 @@ export const processBlockData = async (height) => {
                             })
                             console.log('UPDATE ACCOUNT', account, 'FOLLOWING', followingsData);
                             await updateFollowingsAccount(account,followingsData,data.sequence);
-                            for(let id = 0; id < listFollowing.length; id++) {
-                                await addFollowersAccount(followingsData[id].publicKey, {
-                                    publicKey: account
-                                });
-                            }
-                            await addTimeline(account,`Following ${listFollowing[listFollowing.length-1]}`,tx.time);
                             await updateSequenceAccount(account,data.sequence);
+                            await addTimeline(account,`Following ${listFollowing[listFollowing.length-1]}`,tx.time);
                             return;
                     }
                 }catch(err){
