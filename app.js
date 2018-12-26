@@ -37,14 +37,14 @@ async function run() {
         console.log('Current height', heightdb);
         console.log('Height on chain', blockHeight);
         if(heightdb<blockHeight) {
-            for(let i = heightdb+1; i<=100; i++) {
+            for(let i = heightdb+1; i<=blockHeight; i++) {
                 const d = await processBlockData(i);
                 if(d === 10)
                 return;
             }
             
         }
-        await updateHeight(100);
+        await updateHeight(blockHeight);
         await sleep(5000);
     }
 }

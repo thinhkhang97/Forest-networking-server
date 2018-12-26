@@ -42,6 +42,7 @@ export const processBlockData = async (height) => {
                 console.log( 'ACCOUNT', account,'CREATE ACCOUNT', newAccount, 'SEQUENCE', 0, 'BALANCE', 0, 'POSTS', []);
                 await createAccount(account,newAccount,data.sequence);
                 await addTimeline(account,`Create account ${newAccount}`,tx.time);
+                await addTimeline(newAccount,`Created by ${account}`,tx.time);
                 await updateSequenceAccount(account,data.sequence);
                 return;
             case 'payment':
@@ -57,6 +58,7 @@ export const processBlockData = async (height) => {
                 const d = await payment(account, 0 - amount, data.sequence);
                 await payment(toAccount, amount, null);
                 await addTimeline(account,`Payment ${toAccount} with amount: ${amount}`,tx.time);
+                await addTimeline(toAccount,`Received ${amount} from  ${account}`,tx.time);
                 await updateSequenceAccount(account,data.sequence);
                 return d;
             case 'post':
@@ -85,12 +87,14 @@ export const processBlockData = async (height) => {
                             await updateNameAccount(account,name,data.sequence);
                             console.log('UPDATE ACCOUNT', account, 'NAME', name);
                             await addTimeline(account,`Update name to ${name}`,tx.time);
+                            await updateSequenceAccount(account,data.sequence);
                                 return;
                         case 'picture':
                             const imgData = data.params.value.toString('base64');
                             await updateImageAccount(account,imgData,data.sequence);
                             console.log('UPDATE ACCOUNT', account, 'IMAGE');
                             await addTimeline(account,`Update picture`,tx.time);
+                            await updateSequenceAccount(account,data.sequence);
                                 return;
                         case 'followings':
                             const listFollowing = Followings.decode(data.params.value).addresses;

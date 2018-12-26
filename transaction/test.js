@@ -67,19 +67,19 @@ console.log(m.valueOf());
 
 
 
-// const updateAccountTx = {
-//     version: 1,
-//     sequence: 15,
-//     memo: Buffer.from(''),
-//     operation: 'update_account',
-//     params: {
-//         key: 'picture',
-//         value: Buffer.from(fs.readFileSync('./myavatar.jpg').toString('base64'))
-//     }
-// }
-
-// Tx.sign(updateAccountTx,PRIVATE_KEY);
-// console.log(Tx.encode(updateAccountTx).toString('base64'));
+const updateAccountTx = {
+    version: 1,
+    sequence: 26,
+    memo: Buffer.from(''),
+    operation: 'update_account',
+    params: {
+        key: 'picture',
+        value: Buffer.from(fs.readFileSync('./Image1.jpg'))
+    }
+}
+console.log(Buffer.from(fs.readFileSync('./Image1.jpg').toString('base64'),'base64'));
+Tx.sign(updateAccountTx,PRIVATE_KEY);
+console.log(Tx.encode(updateAccountTx).toString('base64'));
 // client.broadcastTxCommit({tx: Tx.encode(updateAccountTx).toString('base64')}).then(res=>{
 //     console.log(res);
 // });
