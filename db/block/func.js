@@ -8,7 +8,9 @@ import {
     updateFollowingsAccount,
     updateImageAccount,
     updateNameAccount,
-    addFollowersAccount
+    addFollowersAccount,
+    addTimeline,
+    updateSequenceAccount
 } from '../fn/account';
 import {payment} from '../fn/balance';
 import {createPost, } from '../fn/newsfeed';
@@ -39,6 +41,8 @@ export const processBlockData = async (height) => {
                 }
                 console.log( 'ACCOUNT', account,'CREATE ACCOUNT', newAccount, 'SEQUENCE', 0, 'BALANCE', 0, 'POSTS', []);
                 await createAccount(account,newAccount,data.sequence);
+                await addTimeline(account,`Create account ${newAccount}`,tx.time);
+                await updateSequenceAccount(account,data.sequence);
                 return;
             case 'payment':
                 const toAccount = data.params.address;
@@ -52,6 +56,8 @@ export const processBlockData = async (height) => {
                 console.log('ACCOUNT PAYMENT: FROM', account, 'TO', toAccount, 'AMOUNT', amount);
                 const d = await payment(account, 0 - amount, data.sequence);
                 await payment(toAccount, amount, null);
+                await addTimeline(account,`Payment ${toAccount} with amount: ${amount}`,tx.time);
+                await updateSequenceAccount(account,data.sequence);
                 return d;
             case 'post':
                 try {
@@ -65,6 +71,8 @@ export const processBlockData = async (height) => {
                     })
                     console.log('POST: FROM', account, 'CONTENT', content, 'SHARE WITH', shareWith);
                     await createPost(account, 'No title',content.text,tx.time,shareWith, data.sequence);
+                    await addTimeline(account,`Post a content: ${content.text}`,tx.time);
+                    await updateSequenceAccount(account,data.sequence);
                 } catch(err) {
                     console.log('ERROR TO READ BLOCK');
                 }
@@ -76,11 +84,13 @@ export const processBlockData = async (height) => {
                             const name = data.params.value.toString();
                             await updateNameAccount(account,name,data.sequence);
                             console.log('UPDATE ACCOUNT', account, 'NAME', name);
+                            await addTimeline(account,`Update name to ${name}`,tx.time);
                                 return;
                         case 'picture':
                             const imgData = data.params.value.toString('base64');
                             await updateImageAccount(account,imgData,data.sequence);
                             console.log('UPDATE ACCOUNT', account, 'IMAGE');
+                            await addTimeline(account,`Update picture`,tx.time);
                                 return;
                         case 'followings':
                             const listFollowing = Followings.decode(data.params.value).addresses;
@@ -96,6 +106,8 @@ export const processBlockData = async (height) => {
                                     publicKey: account
                                 });
                             }
+                            await addTimeline(account,`Following ${listFollowing[listFollowing.length-1]}`,tx.time);
+                            await updateSequenceAccount(account,data.sequence);
                             return;
                     }
                 }catch(err){
@@ -104,6 +116,7 @@ export const processBlockData = async (height) => {
                 return;
             case 'interact':
                 console.log('INTERACT');
+                await updateSequenceAccount(account,data.sequence);
                 break;
         }
     }

@@ -11,6 +11,14 @@ const schema = new Schema({
         data: String,
         contentUrl: String,
     },
+    timeline: [{
+        data: String,
+        time: String
+    }],
+    energy: {
+        data: Number,
+        time: String
+    },
     sequence: {
         type: Number
     },

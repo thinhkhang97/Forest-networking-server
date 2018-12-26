@@ -1,6 +1,6 @@
 import person from '../models/person';
 import {updateSequenceAccount} from './account';
-async function getBalance(publicKey) {
+export async function getBalance(publicKey) {
     let balance = 0;
     const query = person.findOne({
         publicKey: publicKey
@@ -28,7 +28,5 @@ export async function payment(publicKey, amount, sequence) {
         }
     )
     await query.exec();
-    if(sequence!=null)
-        await updateSequenceAccount(publicKey,sequence+1)
     return 0;
 }

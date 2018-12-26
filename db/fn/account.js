@@ -1,5 +1,8 @@
 import person from '../models/person';
+import {getBalance} from './balance'
 import fs from 'fs';
+import moment from 'moment';
+
 export async function createAccount(accountCreate,publicKey, sequence) {
     // connectServer();
     const p = new person({
@@ -14,7 +17,38 @@ export async function createAccount(accountCreate,publicKey, sequence) {
         posts: []
     })
     await p.save();
-    await updateSequenceAccount(accountCreate,sequence+1);
+}
+
+export async function getTimeline(publicKey) {
+    // connectServer();
+    const query = person.findOne({
+        publicKey: publicKey
+    })
+    const promise = await query.exec();
+    // console.log('Get posts', posts);
+    // mongoose.disconnect();
+    return promise.timeline;
+}
+
+export async function addTimeline(
+    PublicKey,
+    Data,
+    Time
+) {
+    // connectServer();
+    const Timeline = await getTimeline(PublicKey);
+    Timeline.push({
+        data: Data,
+        time: Time
+    })
+    const query = person.update({
+        publicKey: PublicKey,
+    },{
+        timeline: Timeline
+    },{
+        upsert: false
+    })
+    await query.exec();
 }
 
 export async function initAccount(publicKey) {
@@ -26,7 +60,7 @@ export async function initAccount(publicKey) {
             contentType: 'image/png'
         },
         publicKey: publicKey,
-        balance: 200000000000,
+        balance: 9007199254740991,
         sequence: 0,
         posts: []
     })
@@ -69,7 +103,6 @@ export async function updateNameAccount (
             upsert: false
         });
     await query.exec();
-    await updateSequenceAccount(PublicKey,Sequence+1);
 }
 
 export async function updateImageAccount (
@@ -90,7 +123,6 @@ export async function updateImageAccount (
             upsert: false
         })
     await query.exec();
-    await updateSequenceAccount(PublicKey,sequence+1);
 }
 
 export async function updateFollowingsAccount (
@@ -107,7 +139,6 @@ export async function updateFollowingsAccount (
             upsert: false
         })
     await query.exec();
-    await updateSequenceAccount(PublicKey,sequence+1);
 }
 async function isFollowerExist(publicKey, follower) {
     let isExist = false;
@@ -158,4 +189,33 @@ export async function getSomeUser(page, perpage) {
         })
     const data = await query.exec();
     return data;
+}
+
+async function getMaxEnergy(publicKey) {
+    const currentCell = await getBalance(publicKey);
+    return currentCell*(22020096*86400/9007199254740991);
+}
+
+async function getCurrentEnergy(publicKey) {
+    const query = person.findOne({
+        publicKey: publicKey
+    })
+    const promise = await query.exec();
+    // console.log('Account: ', accountInfo);
+    // mongoose.disconnect();
+    return promise.energy;
+}
+
+export async function updateEnergy(publicKey, time) {
+    const currentEnergy = await getCurrentEnergy(publicKey);
+    if(currentEnergy) {
+        const ce = currentEnergy.data;
+        const lt = moment(lt.time).valueOf();
+        const curTime = moment(time).valueOf();
+        const energyInCKIBD = ce*Math.max(0, (86400 - (curTime-lt))/86400);
+        const maxE = await getMaxEnergy(publicKey);
+        const updatedE = maxE - energyInCKIBD;
+    } else {
+
+    } 
 }

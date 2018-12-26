@@ -1,3 +1,4 @@
+const moment = require('moment');
 const Tx = require('./index');
 const vstruct = require('varstruct');
 const crypto = require('crypto');
@@ -44,8 +45,11 @@ const myTransaction = {
     }
 }
 
-Tx.sign(myTransaction,PRIVATE_KEY);
-console.log(Tx.encode(myTransaction).toString('base64'));
+const m = moment('2018-12-08T19:13:08.763990788Z')
+console.log(m.valueOf());
+
+// Tx.sign(myTransaction,PRIVATE_KEY);
+// console.log(Tx.encode(myTransaction).toString('base64'));
 // client.broadcastTxCommit({tx: Tx.encode(myTransaction).toString('base64')}).then(res=>{
 //     console.log(res);
 // })

@@ -45,7 +45,7 @@ export async function createPost(
         shareWith: ShareWith,
         image: Image
     })
-    console.log(allPost);
+    // console.log(allPost);
     const query = person.update({
         publicKey: PublicKey,
     },{
@@ -64,7 +64,6 @@ export async function createPost(
         image: Image
     })
     await n.save();
-    await updateSequenceAccount(PublicKey,sequence+1);
 }
 
 export async function interactPost(publicKey, postId, interact) {
